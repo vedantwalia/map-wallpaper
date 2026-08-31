@@ -126,6 +126,8 @@ dmypy.json
 posters/
 themes/
 fonts/
+!maptoposter/assets/fonts/
+!maptoposter/assets/fonts/**
 .vscode/
 .idea/
 *.swp
