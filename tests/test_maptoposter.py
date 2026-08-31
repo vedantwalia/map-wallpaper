@@ -4,6 +4,7 @@ import pytest
 from pathlib import Path
 from maptoposter import Theme, Geocoder, Renderer, MapPoster
 from maptoposter.renderer import RenderConfig
+import maptoposter.renderer as renderer_module
 
 
 @pytest.fixture
@@ -107,6 +108,48 @@ class TestRenderer:
         renderer = Renderer()
         assert renderer.config.dpi == 300
         assert renderer.config.width == 12
+
+    def test_default_renderer_registers_bundled_roboto(self, monkeypatch):
+        """The default typeface should be available without a system font install."""
+        registered_fonts = []
+        monkeypatch.setattr(
+            renderer_module.font_manager.fontManager,
+            "addfont",
+            registered_fonts.append,
+        )
+
+        Renderer()
+
+        assert registered_fonts == [
+            str(Path(renderer_module.__file__).parent / "assets" / "fonts" / filename)
+            for filename in (
+                "Roboto-Regular.ttf",
+                "Roboto-Medium.ttf",
+                "Roboto-Bold.ttf",
+            )
+        ]
+
+    def test_add_text_labels_is_supported_by_matplotlib(self, render_config, theme):
+        """Text labels should not rely on unsupported Text properties."""
+        renderer = Renderer(render_config)
+        import matplotlib.pyplot as plt
+
+        fig, ax = plt.subplots()
+        try:
+            renderer.add_text_labels(
+                ax,
+                "Paris",
+                "France",
+                theme.to_dict(),
+                coordinates=(48.8566, 2.3522),
+            )
+            assert [text.get_text() for text in ax.texts] == [
+                "PARIS",
+                "FRANCE",
+                "48.8566° / 2.3522°",
+            ]
+        finally:
+            plt.close(fig)
 
 
 class TestMapPoster:

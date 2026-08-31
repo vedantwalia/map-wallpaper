@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Optional, Tuple, Dict, Any
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
+from matplotlib import font_manager
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 import osmnx as ox
@@ -44,9 +45,24 @@ class Renderer:
 
     def _setup_matplotlib(self) -> None:
         """Configure matplotlib settings."""
+        if self.config.font_family.casefold() == "roboto":
+            self._register_bundled_roboto()
         plt.rcParams["font.family"] = self.config.font_family
         plt.rcParams["figure.facecolor"] = "white"
         plt.rcParams["axes.facecolor"] = "white"
+
+    @staticmethod
+    def _register_bundled_roboto() -> None:
+        """Make the bundled Roboto Regular, Medium, and Bold faces available."""
+        fonts_dir = Path(__file__).parent / "assets" / "fonts"
+        for filename in (
+            "Roboto-Regular.ttf",
+            "Roboto-Medium.ttf",
+            "Roboto-Bold.ttf",
+        ):
+            font_path = fonts_dir / filename
+            if font_path.is_file():
+                font_manager.fontManager.addfont(str(font_path))
 
     def create_map(
         self,
@@ -262,7 +278,6 @@ class Renderer:
             ha="center",
             transform=ax.transAxes,
             color=text_color,
-            letter_spacing=2,
             zorder=11,
         )
 

@@ -29,6 +29,7 @@ This is a refactored, class-based version of MapToPoster with modular architectu
 - 300 DPI by default
 - Configurable dimensions (up to 20x20 inches)
 - PNG export ready for print
+- Bundled Roboto font, so the default typography works without a system install
 - Customizable font families
 
 🌍 **Multilingual Support**
@@ -37,6 +38,14 @@ This is a refactored, class-based version of MapToPoster with modular architectu
 - Google Fonts integration ready
 
 ## Installation
+
+### Bundled font
+
+The default `Roboto` font is bundled at `maptoposter/assets/fonts/` and is
+registered automatically when `font_family` is `"Roboto"`. It is licensed under
+the [SIL Open Font License 1.1](maptoposter/assets/fonts/OFL.txt); see the font
+directory's `README.md` for its source. Other font families must be installed on
+the system as usual.
 
 ### Quick Start (with uv - Recommended)
 

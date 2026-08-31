@@ -57,6 +57,9 @@ maptoposter = "maptoposter.cli:main"
 [tool.setuptools]
 packages = ["maptoposter"]
 
+[tool.setuptools.package-data]
+maptoposter = ["assets/fonts/*.ttf", "assets/fonts/*.txt", "assets/fonts/*.md"]
+
 [tool.black]
 line-length = 88
 target-version = ["py39", "py310", "py311", "py312"]
