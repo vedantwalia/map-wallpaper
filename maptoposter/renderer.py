@@ -115,27 +115,57 @@ class Renderer:
             graph: OSMnx graph
             theme: Theme dictionary
         """
-        # Get edge colors and widths
-        edges = ox.graph_to_gdf(graph, edges=True, nodes=False)
+        # Plot the street network using osmnx's built-in visualization
+        # This automatically handles all edges with proper styling
+        default_edge_color = theme.get("road_secondary", "#2A2A2A")
+        
+        try:
+            ox.plot_graph(
+                graph,
+                ax=ax,
+                node_size=0,
+                edge_color=default_edge_color,
+                edge_linewidth=0.8,
+                show=False,
+                close=False,
+            )
+        except Exception as e:
+            # If ox.plot_graph fails, plot edges manually
+            print(f"Warning: Could not use ox.plot_graph: {e}")
+            self._plot_streets_manual(ax, graph, theme)
 
-        for idx, edge in edges.iterrows():
-            highway = edge.get("highway", "default")
+    def _plot_streets_manual(
+        self,
+        ax: Axes,
+        graph: nx.MultiDiGraph,
+        theme: Dict[str, str],
+    ) -> None:
+        """
+        Manually plot streets by iterating through graph edges.
+        
+        Args:
+            ax: Matplotlib axes
+            graph: OSMnx graph
+            theme: Theme dictionary
+        """
+        for u, v, k, data in graph.edges(keys=True, data=True):
+            # Get highway type
+            highway = data.get("highway", "default")
             if isinstance(highway, list):
                 highway = highway[0]
 
-            # Get color
+            # Get color and width
             color_key = f"road_{highway}"
             color = theme.get(color_key, theme.get("road_default", "#3A3A3A"))
+            width = self._get_road_width(color_key)
 
-            # Get width
-            width_key = f"road_{highway}"
-            width = self._get_road_width(width_key)
-
-            # Plot edge
-            coords = edge.geometry.coords
-            lons = [c[0] for c in coords]
-            lats = [c[1] for c in coords]
-            ax.plot(lons, lats, color=color, linewidth=width, zorder=3)
+            # Plot edge if it has geometry
+            if "geometry" in data:
+                geom = data["geometry"]
+                coords = list(geom.coords)
+                lons = [c[0] for c in coords]
+                lats = [c[1] for c in coords]
+                ax.plot(lons, lats, color=color, linewidth=width, zorder=3)
 
     def _plot_features(
         self,

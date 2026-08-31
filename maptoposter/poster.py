@@ -159,7 +159,17 @@ class MapPoster:
         Returns:
             Theme dictionary or None
         """
-        themes = {
+        themes = self._get_builtin_themes_dict()
+        return themes.get(theme_name)
+
+    def _get_builtin_themes_dict(self) -> Dict[str, Dict[str, Any]]:
+        """
+        Get all built-in themes.
+        
+        Returns:
+            Dictionary of all built-in themes
+        """
+        return {
             "terracotta": {
                 "name": "terracotta",
                 "description": "Mediterranean warmth",
@@ -213,7 +223,6 @@ class MapPoster:
                 "road_residential": "#FFD7A8",
             },
         }
-        return themes.get(theme_name)
 
     def list_themes(self) -> list:
         """
@@ -225,7 +234,7 @@ class MapPoster:
         themes = set()
 
         # Add built-in themes
-        themes.update(self._get_builtin_theme("terracotta").keys() for _ in [None])
+        themes.update(self._get_builtin_themes_dict().keys())
 
         # Add themes from directory
         if self.theme_dir.exists():
